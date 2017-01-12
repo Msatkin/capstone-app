@@ -19,6 +19,7 @@ module.exports = React.createClass({
       confirm_password: '',
       email: '',
       border_color: ['#328FE6','#328FE6','#328FE6','#328FE6'],
+      error: ['','',''],
     };
   },
   render: function() {
@@ -37,6 +38,9 @@ module.exports = React.createClass({
           <Text style={styles.title}>GeoChat</Text>
         </View>
         <View style={styles.register_container}>
+          <Text style={styles.error_message}>{this.state.error[2]}</Text>
+          <Text style={styles.error_message}>{this.state.error[1]}</Text>
+          <Text style={styles.error_message_final}>{this.state.error[0]}</Text>
           <TextInput
             style={[styles.input, {borderColor: this.state.border_color[0]}]}
             value={this.state.email}
@@ -84,6 +88,7 @@ module.exports = React.createClass({
     );
   },
   tryRegister: function() {
+    this.state.error = ['', '', ''];
     if (this.verifyInfo()) {
       var hash = this.hashPassword();
       axios({
@@ -92,9 +97,21 @@ module.exports = React.createClass({
         dataType: "json"
       })
       .then(function (response) {
-        console.log('**************************SUCCESS**************************');
         console.log(response.request._response);
-        this.props.navigator.push({ name: 'account'});
+        if (response.request._response == 'success') {
+          this.props.navigator.push({ name: 'account'});
+        }
+        else if (response.request._response == 'email') {
+          this.displayError('That email is already taken');
+          this.state.email = '';
+        }
+        else if (response.request._response == 'username') {
+          this.displayError('That username is already taken');
+          this.state.username = '';
+        }
+        else if (response.request._response == 'fail') {
+          this.displayError('Registration has failed unexpectedly');
+        }
       })
       .catch(function (error) {
         console.log(error);
@@ -108,7 +125,7 @@ module.exports = React.createClass({
   createSalt: function() {
     var salt = 0;
     for (var i = 0; i < this.state.username.length; i++) {
-      salt += this.state.username.fromCharCode(i);
+      salt += this.state.username.charCodeAt(i);
     }
     return salt;
   },
@@ -116,7 +133,11 @@ module.exports = React.createClass({
     this.props.navigator.push({ name: 'login'});
   },
   verifyInfo: function () {
-    if (this.verifyPasswords() && this.verifyEmail() && this.verifyUsername()) {
+    var isPasswordValid = this.verifyPasswords();
+    var isEmailValid = this.verifyEmail();
+    var isUsernameValid = this.verifyUsername();
+
+    if (isPasswordValid && isEmailValid && isUsernameValid) {
       return true;
     }
     this.forceUpdate();
@@ -128,12 +149,14 @@ module.exports = React.createClass({
       this.state.border_color[3] = '#ff0000';
       this.state.password = '';
       this.state.confirm_password = '';
+      this.displayError('Passwords do not match')
     }
     else if (this.state.password.length < 8) {
       this.state.border_color[2] = '#ff0000';
       this.state.border_color[3] = '#ff0000';
       this.state.password = '';
       this.state.confirm_password = '';
+      this.displayError('Password must be at least 8 charaters')
     }
     else {
       return true;
@@ -143,7 +166,9 @@ module.exports = React.createClass({
   verifyEmail: function() {
     if (this.state.email === '') {
       this.state.border_color[0] = '#ff0000';
-      this.state.email = '';
+      this.state.password = '';
+      this.state.confirm_password = '';
+      this.displayError('Please enter an email')
       return false;
     }
     return true;
@@ -151,13 +176,38 @@ module.exports = React.createClass({
   verifyUsername: function() {
     if (this.state.username === '') {
       this.state.border_color[1] = '#ff0000';
-      this.state.username = '';
+      this.state.password = '';
+      this.state.confirm_password = '';
+      this.displayError('Please enter a username')
       return false;
     }
     return true;
+  },
+  displayError: function(message) {
+    if (this.state.error[0] === '') {
+      this.state.error[0] = message;
+    }
+    else if (this.state.error[1] === '') {
+      this.state.error[1] = message;
+    }
+    else {
+      this.state.error[2] = message;
+    }
   }
 });
 var styles = StyleSheet.create({
+  container_error_messages: {
+
+  },
+  error_message: {
+    fontWeight: '600',
+    color: '#ff0000'
+  },
+  error_message_final: {
+    fontWeight: '600',
+    color: '#ff0000',
+    marginBottom: 5,
+  },
   container_title: {
     flex: 1,
     justifyContent: 'center',

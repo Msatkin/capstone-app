@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "axios": "^0.15.3",
+    "bcryptjs": "^2.4.0",
     "react": "15.3.1",
     "react-native": "0.35.0"
   },
