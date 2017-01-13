@@ -8,8 +8,19 @@ import {
   StyleSheet
 } from 'react-native';
 
+import { findNodeHandle } from 'react-native'
+import TextInputState from 'react-native/lib/TextInputState'
 import axios from 'axios';
 var bcrypt = require('bcryptjs');
+var crypto;
+try {
+  crypto = require('crypto');
+} catch (err) {
+  console.log('crypto support is disabled!');
+}
+var AES = require("crypto-js/aes");
+var SHA256 = require("crypto-js/sha256");
+var CryptoJS = require("crypto-js");
 
 module.exports = React.createClass({
   getInitialState: function() {
@@ -20,6 +31,7 @@ module.exports = React.createClass({
       email: '',
       border_color: ['#328FE6','#328FE6','#328FE6','#328FE6'],
       error: ['','',''],
+      textbox_focus: [true, false, false, false],
     };
   },
   render: function() {
@@ -42,39 +54,54 @@ module.exports = React.createClass({
           <Text style={styles.error_message}>{this.state.error[1]}</Text>
           <Text style={styles.error_message_final}>{this.state.error[0]}</Text>
           <TextInput
+            focus={this.state.textbox_focus[0]}
             style={[styles.input, {borderColor: this.state.border_color[0]}]}
             value={this.state.email}
             onChangeText={(text) => this.setState({email: text})}
             placeholder={'Enter Email'}
+            returnKeyLabel={'Next'}
             multiline={false}
+            onSubmitEditing={() => this.focusTextInput(this.refs.usernameInput)}
             />
-            <TextInput
-              style={[styles.input, {borderColor: this.state.border_color[1]}]}
-              value={this.state.username}
-              onChangeText={(text) => this.setState({username: text})}
-              placeholder={'Enter Username'}
-              maxLength={18}
-              multiline={false}
-              />
+          <TextInput
+            ref={'usernameInput'}
+            focus={this.state.textbox_focus[1]}
+            style={[styles.input, {borderColor: this.state.border_color[1]}]}
+            value={this.state.username}
+            onChangeText={(text) => this.setState({username: text})}
+            placeholder={'Enter Username'}
+            maxLength={18}
+            multiline={false}
+            returnKeyLabel={'Next'}
+            onSubmitEditing={() => this.focusTextInput(this.refs.passwordInput)}
+            />
 
-            <TextInput
-              style={[styles.input, {borderColor: this.state.border_color[2]}]}
-              value={this.state.password}
-              secureTextEntry={true}
-              onChangeText={(text) => this.setState({password: text})}
-              placeholder={'Enter Password'}
-              maxLength={18}
-              multiline={false}
-              />
-              <TextInput
-                style={[styles.input, {borderColor: this.state.border_color[3]}]}
-                value={this.state.confirm_password}
-                secureTextEntry={true}
-                onChangeText={(text) => this.setState({confirm_password: text})}
-                placeholder={'Confirm Password'}
-                maxLength={18}
-                multiline={false}
-                />
+          <TextInput
+            ref={'passwordInput'}
+            focus={this.state.textbox_focus[2]}
+            style={[styles.input, {borderColor: this.state.border_color[2]}]}
+            value={this.state.password}
+            secureTextEntry={true}
+            onChangeText={(text) => this.setState({password: text})}
+            placeholder={'Enter Password'}
+            maxLength={18}
+            multiline={false}
+            returnKeyLabel={'Next'}
+            onSubmitEditing={() => this.focusTextInput(this.refs.confirmPasswordInput)}
+            />
+          <TextInput
+            ref={'confirmPasswordInput'}
+            focus={this.state.textbox_focus[3]}
+            style={[styles.input, {borderColor: this.state.border_color[3]}]}
+            value={this.state.confirm_password}
+            secureTextEntry={true}
+            onChangeText={(text) => this.setState({confirm_password: text})}
+            placeholder={'Confirm Password'}
+            maxLength={18}
+            multiline={false}
+            returnKeyLabel={'Done'}
+            onSubmitEditing={(event) => this.tryRegister()}
+            />
 
           <TouchableHighlight
             style={styles.button}
@@ -89,45 +116,47 @@ module.exports = React.createClass({
   },
   tryRegister: function() {
     this.state.error = ['', '', ''];
+    this.state.border_color = ['#328FE6','#328FE6','#328FE6','#328FE6'];
+    console.log('attempting..')
     if (this.verifyInfo()) {
-      var hash = this.hashPassword();
-      axios({
-        method: 'post',
-        url: 'http://catkinson-001-site1.htempurl.com/api/Register?username='+ this.state.username +'&password=' + this.state.password + '&email' + this.state.email,
-        dataType: "json"
-      })
-      .then(function (response) {
-        console.log(response.request._response);
-        if (response.request._response == 'success') {
-          this.props.navigator.push({ name: 'account'});
-        }
-        else if (response.request._response == 'email') {
-          this.displayError('That email is already taken');
-          this.state.email = '';
-        }
-        else if (response.request._response == 'username') {
-          this.displayError('That username is already taken');
-          this.state.username = '';
-        }
-        else if (response.request._response == 'fail') {
-          this.displayError('Registration has failed unexpectedly');
-        }
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
+      this.attemptAccountCreation();
     }
+  },
+  attemptAccountCreation: function() {
+    var hash = this.hashPassword();
+    axios({
+      method: 'post',
+      url: 'http://catkinson-001-site1.htempurl.com/api/Register?username='+ this.state.username +'&password=' + hash + '&email=' + this.state.email
+    })
+    .then(function (response) {
+      console.log(response.request._response);
+      if (response.request._response == 'success') {
+        this.props.navigator.push({ name: 'account'});
+      }
+      else if (response.request._response == 'email') {
+        this.displayError('That email is already taken');
+        this.state.email = '';
+      }
+      else if (response.request._response == 'username') {
+        this.displayError('That username is already taken');
+        this.state.username = '';
+      }
+      else if (response.request._response == 'fail') {
+        this.displayError('Registration has failed unexpectedly');
+      }
+      else {
+        console.log(response.request._response);
+      }
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
   },
   hashPassword: function() {
-    var salt = this.createSalt();
-    return bcrypt.hashSync(this.state.password, salt);
+    return CryptoJS.HmacSHA1(this.state.password, this.createSalt()).toString();
   },
   createSalt: function() {
-    var salt = 0;
-    for (var i = 0; i < this.state.username.length; i++) {
-      salt += this.state.username.charCodeAt(i);
-    }
-    return salt;
+      return CryptoJS.HmacSHA1(this.state.username, "Key").toString();
   },
   gotoLogin: function() {
     this.props.navigator.push({ name: 'login'});
@@ -192,6 +221,13 @@ module.exports = React.createClass({
     }
     else {
       this.state.error[2] = message;
+    }
+  },
+  focusTextInput: function(node) {
+    try {
+      TextInputState.focusTextInput(findNodeHandle(node))
+    } catch(e) {
+      console.log("Couldn't focus text input: ", e.message)
     }
   }
 });
