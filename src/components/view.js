@@ -84,7 +84,8 @@ var styles = StyleSheet.create({
       backgroundColor:'#6E5BAA',
       paddingTop:10,
       paddingBottom:10,
-      flexDirection:'row'
+      flexDirection:'row',
+      elevation: 10
   },
   toolbarButton: {
       color:'#fff',

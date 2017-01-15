@@ -20,29 +20,56 @@ module.exports = React.createClass({
   },
   getInitialState: function() {
     return {
-      token: ''
+      token: '',
+      message: '',
+      position: ''
     };
   },
   render: function() {
     return (
-      <View>
-        <View style={styles.toolbar}>
+      <View style={styles.body}>
+        <View style={styles.navbar}>
+          <View style={styles.toolbar}>
+            <TouchableHighlight
+              style={styles.button}
+              underlayColor={'#4d3f76'}
+              onPress={this.gotoLeftPage}
+              >
+              <Text style={styles.toolbarButton}>Account</Text>
+            </TouchableHighlight>
+
+            <Text style={styles.toolbarTitle}>Post</Text>
+
+            <TouchableHighlight
+              style={styles.button}
+              underlayColor={'#4d3f76'}
+              onPress={this.gotoRightPage}
+              >
+              <Text style={styles.toolbarButton}>View</Text>
+            </TouchableHighlight>
+          </View>
+        </View>
+        <View style={styles.input}>
+          <View style={styles.messageArea}>
+            <TextInput
+              focus={true}
+              style={styles.messageBox}
+              value={this.state.message}
+              onChangeText={(text) => this.setState({message: text})}
+              placeholder={'Type your post here..'}
+              returnKeyLabel={'Post'}
+              maxLength={160}
+              multiline={true}
+              />
+          </View>
+        </View>
+        <View style={styles.submitArea}>
           <TouchableHighlight
             style={styles.button}
-            underlayColor={'#4d3f76'}
-            onPress={this.gotoLeftPage}
+            underlayColor={'#328FE6'}
+            onPress={this.submit}
             >
-            <Text style={styles.toolbarButton}>Account</Text>
-          </TouchableHighlight>
-
-          <Text style={styles.toolbarTitle}>Post</Text>
-
-          <TouchableHighlight
-            style={styles.button}
-            underlayColor={'#4d3f76'}
-            onPress={this.gotoRightPage}
-            >
-            <Text style={styles.toolbarButton}>View</Text>
+            <Text style={styles.submitButton}>Submit</Text>
           </TouchableHighlight>
         </View>
       </View>
@@ -50,6 +77,45 @@ module.exports = React.createClass({
   },
   gotoLeftPage: function() {
     this.props.navigator.push({ name: 'account'});
+  },
+  submit: function() {
+    if (this.state.message === '') {
+      return;
+    }
+    if (!this.getPosition()) {
+      return;
+    }
+    this.sendMessage();
+  },
+  sendMessage: function() {
+    axios({
+      method: 'post',
+      url: 'http://catkinson-001-site1.htempurl.com/api/Message?token='+ this.state.token +'&message=' + this.state.message + '&longitude=' + this.state.position[0] + '&latitude=' + this.state.position[1]
+    })
+    .then(function (data) {
+      var response = data.request._response.split('"')[1];
+      if (response !== 'success') {
+        return;
+      }
+      this.props.navigator.push({ name: 'view'})
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+  },
+  getPosition: function() {
+    navigator.geolocation.getCurrentPosition(
+          (position) => {
+            console.log(position);
+            this.state.position = [ position.coords.longitude, position.coords.latitude ];
+            return true;
+          },
+          (error) => {
+            console.log((JSON.stringify(error)));
+            return false;
+          },
+          {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000}
+        );
   },
   gotoRightPage: function() {
     this.props.navigator.push({ name: 'view'});
@@ -80,11 +146,34 @@ module.exports = React.createClass({
 });
 
 var styles = StyleSheet.create({
+  body: {
+    flex: 1,
+    flexDirection:'column'
+  },
+  navbar: {
+    flex:1,
+    flexDirection:'column',
+    alignItems:'flex-start'
+  },
+  submitArea: {
+    backgroundColor: '#328FE6',
+    justifyContent: 'flex-end'
+  },
+  messageBox: {
+    flex: 1,
+    textAlignVertical: 'bottom'
+  },
+  submitButton: {
+    color:'#fff',
+    textAlign:'center',
+    padding: 7
+  },
   toolbar: {
       backgroundColor:'#6E5BAA',
       paddingTop:10,
       paddingBottom:10,
-      flexDirection:'row'
+      flexDirection:'row',
+      elevation: 10
   },
   toolbarButton: {
       color:'#fff',
@@ -102,4 +191,13 @@ var styles = StyleSheet.create({
       padding: 10,
       flex: 1
     },
+    input: {
+      flex: 10,
+      marginTop: 10,
+      justifyContent: 'flex-end'
+    },
+    messageArea: {
+      flex: 1,
+      justifyContent: 'flex-end'
+    }
 });

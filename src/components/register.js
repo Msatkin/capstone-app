@@ -124,7 +124,7 @@ module.exports = React.createClass({
     })
     .then(function (data) {
       var response = data.request._response.split('"')[1];
-      switch (response.request._response) {
+      switch (response) {
         case 'success':
         console.log("success");
           this.props.navigator.push({ name: 'account'});
