@@ -32,27 +32,27 @@ module.exports = React.createClass({
             underlayColor={'#4d3f76'}
             onPress={this.gotoLeftPage}
             >
-            <Text style={styles.toolbarButton}>View</Text>
+            <Text style={styles.toolbarButton}>Post</Text>
           </TouchableHighlight>
 
-          <Text style={styles.toolbarTitle}>Account</Text>
+          <Text style={styles.toolbarTitle}>View</Text>
 
           <TouchableHighlight
             style={styles.button}
             underlayColor={'#4d3f76'}
             onPress={this.gotoRightPage}
             >
-            <Text style={styles.toolbarButton}>Post</Text>
+            <Text style={styles.toolbarButton}>Account</Text>
           </TouchableHighlight>
         </View>
       </View>
     );
   },
   gotoLeftPage: function() {
-    this.props.navigator.push({ name: 'view'});
+    this.props.navigator.push({ name: 'post'});
   },
   gotoRightPage: function() {
-    this.props.navigator.push({ name: 'post'});
+    this.props.navigator.push({ name: 'account'});
   },
   checkToken: function() {
     if (this.state.token === null) {
@@ -84,8 +84,7 @@ var styles = StyleSheet.create({
       backgroundColor:'#6E5BAA',
       paddingTop:10,
       paddingBottom:10,
-      flexDirection:'row',
-      elevation: 10
+      flexDirection:'row'
   },
   toolbarButton: {
       color:'#fff',
@@ -94,7 +93,7 @@ var styles = StyleSheet.create({
   toolbarTitle: {
       color:'#fff',
       textAlign:'center',
-      fontWeight: '900',
+      fontWeight:'900',
       flex:1
   },
   button: {

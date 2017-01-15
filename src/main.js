@@ -10,11 +10,15 @@ import {
 var Login = require('./components/login');
 var Account = require('./components/account');
 var Register = require('./components/register');
+var Post = require('./components/post');
+var ViewMessages = require('./components/view');
 
 var ROUTES = {
   login: Login,
   account: Account,
-  register: Register
+  register: Register,
+  post: Post,
+  view: ViewMessages
 };
 
 module.exports = React.createClass({

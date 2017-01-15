@@ -11,13 +11,7 @@ import {
 import { findNodeHandle } from 'react-native'
 import TextInputState from 'react-native/lib/TextInputState'
 import axios from 'axios';
-var bcrypt = require('bcryptjs');
-var crypto;
-try {
-  crypto = require('crypto');
-} catch (err) {
-  console.log('crypto support is disabled!');
-}
+
 var AES = require("crypto-js/aes");
 var SHA256 = require("crypto-js/sha256");
 var CryptoJS = require("crypto-js");
@@ -128,24 +122,31 @@ module.exports = React.createClass({
       method: 'post',
       url: 'http://catkinson-001-site1.htempurl.com/api/Register?username='+ this.state.username +'&password=' + hash + '&email=' + this.state.email
     })
-    .then(function (response) {
-      console.log(response.request._response);
-      if (response.request._response == 'success') {
-        this.props.navigator.push({ name: 'account'});
-      }
-      else if (response.request._response == 'email') {
-        this.displayError('That email is already taken');
-        this.state.email = '';
-      }
-      else if (response.request._response == 'username') {
-        this.displayError('That username is already taken');
-        this.state.username = '';
-      }
-      else if (response.request._response == 'fail') {
-        this.displayError('Registration has failed unexpectedly');
-      }
-      else {
-        console.log(response.request._response);
+    .then(function (data) {
+      var response = data.request._response.split('"')[1];
+      switch (response.request._response) {
+        case 'success':
+        console.log("success");
+          this.props.navigator.push({ name: 'account'});
+          break;
+
+        case 'email':
+          this.displayError('That email is already taken');
+          this.state.email = '';
+          break;
+
+        case 'username':
+          this.displayError('That username is already taken');
+          this.state.username = '';
+          break;
+
+        case 'fail':
+          this.displayError('Registration has failed unexpectedly');
+          break;
+
+        default:
+          console.log(response);
+          break;
       }
     })
     .catch(function (error) {
