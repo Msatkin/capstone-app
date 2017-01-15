@@ -80,12 +80,10 @@ module.exports = React.createClass({
   },
   submit: function() {
     if (this.state.message === '') {
+      console.log("No message entered");
       return;
     }
-    if (!this.getPosition()) {
-      return;
-    }
-    this.sendMessage();
+    this.getPosition();
   },
   sendMessage: function() {
     axios({
@@ -97,7 +95,7 @@ module.exports = React.createClass({
       if (response !== 'success') {
         return;
       }
-      this.props.navigator.push({ name: 'view'})
+      this.props.navigator.push({ name: 'view'});
     })
     .catch(function (error) {
       console.log(error);
@@ -106,16 +104,22 @@ module.exports = React.createClass({
   getPosition: function() {
     navigator.geolocation.getCurrentPosition(
           (position) => {
-            console.log(position);
             this.state.position = [ position.coords.longitude, position.coords.latitude ];
-            return true;
+            console.log(this.state.position);
+            this.sendMessage();
           },
           (error) => {
             console.log((JSON.stringify(error)));
-            return false;
           },
           {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000}
         );
+  },
+  testFunction: function() {
+    return (
+      <View>
+        <Text>HAHHAHAHAHAHHAHAHAHAHHA</Text>
+      </View>
+    )
   },
   gotoRightPage: function() {
     this.props.navigator.push({ name: 'view'});

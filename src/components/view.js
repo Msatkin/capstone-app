@@ -45,6 +45,9 @@ module.exports = React.createClass({
             <Text style={styles.toolbarButton}>Account</Text>
           </TouchableHighlight>
         </View>
+        <View style={styles.viewBox}>
+
+        </View>
       </View>
     );
   },
@@ -76,7 +79,9 @@ module.exports = React.createClass({
       console.log(error);
     });
   },
+  getMessages: function() {
 
+  }
 });
 
 var styles = StyleSheet.create({
@@ -103,4 +108,7 @@ var styles = StyleSheet.create({
       padding: 10,
       flex: 1
     },
+    viewBox: {
+      flex: 1
+    }
 });
