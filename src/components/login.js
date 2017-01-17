@@ -18,6 +18,7 @@ module.exports = React.createClass({
   componentDidMount: function() {
     store.get('token').then(token => {
       this.state.token = token.loginToken;
+      console.log(token);
       console.log('Token found');
       this.checkToken();
     });
@@ -98,14 +99,14 @@ module.exports = React.createClass({
     .then(function (data) {
       this.state = currentState;
       var response = data.request._response.split('"')[1];
+      var storeToken = saveToken;
       response = response.split(':');
       console.log(response);
-      console.log('state: ', this.state);
       this.state.loginResponse = response;
       switch(response[0]) {
         case 'success':
           console.log('SUCCESS');
-          this.state.token = response[1];
+          storeToken(response[1]);
           save();
           nav.push({ name: 'account'});
           break;
@@ -126,6 +127,7 @@ module.exports = React.createClass({
     if (this.state.token === null) {
       return;
     }
+    console.log(this.state.token);
     var nav = this.props.navigator;
     console.log('Attempting to login with token..');
     axios({
@@ -151,11 +153,11 @@ module.exports = React.createClass({
       console.log(error);
     });
   },
-  saveToken: function() {
+  saveToken: function(token) {
     try {
-      console.log(this.state.token);
-      store.save('token', {loginToken: this.state.token});
-      //DB.loginToken.add(this.state.token, 'token')
+      console.log('Saving token: ' + token);
+      store.save('token', {loginToken: token});
+      this.state.token = token;
       console.log('Token saved');
     } catch (error) {
       console.log(error);

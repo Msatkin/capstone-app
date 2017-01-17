@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import axios from 'axios';
 import store from 'react-native-simple-store';
+import MessageLoader from './messageLoader';
 
 module.exports = React.createClass({
   componentDidMount: function() {
@@ -26,6 +27,11 @@ module.exports = React.createClass({
     };
   },
   render: function() {
+    if (window.loadMessages) {
+      console.log('Loading messages..');
+      MessageLoader.getMessages(this.state.token);
+      window.loadMessages = false;
+    }
     return (
       <View style={styles.body}>
         <View style={styles.navbar}>
@@ -83,43 +89,27 @@ module.exports = React.createClass({
       console.log("No message entered");
       return;
     }
-    this.getPosition();
+    this.sendMessage();
   },
   sendMessage: function() {
+    if (window.position === undefined) {
+      return;
+    }
+    var nav = this.props.navigator;
     axios({
       method: 'post',
-      url: 'http://catkinson-001-site1.htempurl.com/api/Message?token='+ this.state.token +'&message=' + this.state.message + '&longitude=' + this.state.position[0] + '&latitude=' + this.state.position[1]
+      url: 'http://catkinson-001-site1.htempurl.com/api/Message?token='+ this.state.token +'&message=' + this.state.message + '&longitude=' + window.position[0] + '&latitude=' + window.position[1]
     })
     .then(function (data) {
       var response = data.request._response.split('"')[1];
       if (response !== 'success') {
         return;
       }
-      this.props.navigator.push({ name: 'view'});
+      nav.push({ name: 'view'});
     })
     .catch(function (error) {
       console.log(error);
     });
-  },
-  getPosition: function() {
-    navigator.geolocation.getCurrentPosition(
-          (position) => {
-            this.state.position = [ position.coords.longitude, position.coords.latitude ];
-            console.log(this.state.position);
-            this.sendMessage();
-          },
-          (error) => {
-            console.log((JSON.stringify(error)));
-          },
-          {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000}
-        );
-  },
-  testFunction: function() {
-    return (
-      <View>
-        <Text>HAHHAHAHAHAHHAHAHAHAHHA</Text>
-      </View>
-    )
   },
   gotoRightPage: function() {
     this.props.navigator.push({ name: 'view'});

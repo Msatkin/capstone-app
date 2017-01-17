@@ -6,6 +6,7 @@ import {
     StyleSheet,
     Navigator
 } from 'react-native';
+import axios from 'axios';
 
 var Login = require('./components/login');
 var Account = require('./components/account');
@@ -22,6 +23,28 @@ var ROUTES = {
 };
 
 module.exports = React.createClass({
+  watchID: null,
+  componentDidMount: function() {
+    window.messages = '';
+    window.loadMessages = false;
+    var loadMessages = this.getMessages;
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        window.position = [ position.coords.longitude, position.coords.latitude ];
+        console.log('Global Position: ' + window.position);
+        window.loadMessages = true;
+        this.forceUpdate();
+      },
+      (error) => console.log(JSON.stringify(error)),
+      {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000}
+    );
+    window.watchID = navigator.geolocation.watchPosition((position) => {
+      window.position = [ position.coords.longitude, position.coords.latitude ];
+      console.log('Global Position: ' + window.position);
+      window.loadMessages = true;
+      this.forceUpdate();
+    });
+  },
   renderScene: function(route, navigator) {
     var Component = ROUTES[route.name];
     return <Component route={route} navigator={navigator} />;

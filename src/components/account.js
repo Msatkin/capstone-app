@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import axios from 'axios';
 import store from 'react-native-simple-store';
+import MessageLoader from './messageLoader';
 
 module.exports = React.createClass({
   componentDidMount: function() {
@@ -24,6 +25,11 @@ module.exports = React.createClass({
     };
   },
   render: function() {
+    if (window.loadMessages) {
+      console.log('Loading messages..');
+      MessageLoader.getMessages(this.state.token);
+      window.loadMessages = false;
+    }
     return (
       <View>
         <View style={styles.toolbar}>

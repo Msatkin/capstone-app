@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import axios from 'axios';
 import store from 'react-native-simple-store';
+import MessageLoader from './messageLoader';
 
 module.exports = React.createClass({
   componentDidMount: function() {
@@ -16,7 +17,9 @@ module.exports = React.createClass({
       this.state.token = token.loginToken;
       console.log('Token found');
       this.checkToken();
+      this.getMessages();
     });
+    console.log('Has geolocation: ' + (window.position !== undefined));
   },
   getInitialState: function() {
     return {
@@ -24,6 +27,12 @@ module.exports = React.createClass({
     };
   },
   render: function() {
+    if (window.loadMessages) {
+      console.log('Loading messages..');
+      MessageLoader.getMessages(this.state.token);
+      window.loadMessages = false;
+    }
+    var messages = <Text style={styles.loadingMessages}>{window.messages}</Text>
     return (
       <View>
         <View style={styles.toolbar}>
@@ -46,7 +55,7 @@ module.exports = React.createClass({
           </TouchableHighlight>
         </View>
         <View style={styles.viewBox}>
-
+          {messages}
         </View>
       </View>
     );
@@ -70,18 +79,16 @@ module.exports = React.createClass({
     })
     .then(function (data) {
       var response = data.request._response.split('"')[1];
-      console.log(response);
+      console.log('Token check: ' + response);
       if (response !== 'success') {
           nav.push({ name: 'login'});
+          return;
       }
     })
     .catch(function (error) {
-      console.log(error);
+      console.log('Error: ' + error);
     });
   },
-  getMessages: function() {
-
-  }
 });
 
 var styles = StyleSheet.create({
@@ -91,6 +98,9 @@ var styles = StyleSheet.create({
       paddingBottom:10,
       flexDirection:'row',
       elevation: 10
+  },
+  loadingMessages: {
+
   },
   toolbarButton: {
       color:'#fff',

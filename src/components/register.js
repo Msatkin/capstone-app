@@ -11,6 +11,7 @@ import {
 import { findNodeHandle } from 'react-native'
 import TextInputState from 'react-native/lib/TextInputState'
 import axios from 'axios';
+import store from 'react-native-simple-store';
 
 var AES = require("crypto-js/aes");
 var SHA256 = require("crypto-js/sha256");
@@ -118,30 +119,24 @@ module.exports = React.createClass({
   },
   attemptAccountCreation: function() {
     var hash = this.hashPassword();
+    var display = this.displayError;
+    var nav = this.props.navigator;
+    var storeToken = this.saveToken;
     axios({
       method: 'post',
       url: 'http://catkinson-001-site1.htempurl.com/api/Register?username='+ this.state.username +'&password=' + hash + '&email=' + this.state.email
     })
     .then(function (data) {
-      var response = data.request._response.split('"')[1];
-      switch (response) {
+      var response = data.request._response.split('"')[1].split(':');
+      console.log(response);
+      switch (response[0]) {
         case 'success':
-        console.log("success");
-          this.props.navigator.push({ name: 'account'});
+          storeToken(response[1]);
+          nav.push({ name: 'account'});
           break;
 
-        case 'email':
-          this.displayError('That email is already taken');
-          this.state.email = '';
-          break;
-
-        case 'username':
-          this.displayError('That username is already taken');
-          this.state.username = '';
-          break;
-
-        case 'fail':
-          this.displayError('Registration has failed unexpectedly');
+        case 'error':
+          display(response[1]);
           break;
 
         default:
@@ -155,6 +150,16 @@ module.exports = React.createClass({
   },
   hashPassword: function() {
     return CryptoJS.HmacSHA1(this.state.password, this.createSalt()).toString();
+  },
+  saveToken: function(token) {
+    try {
+      console.log('Saving token: ' + token);
+      store.save('token', {loginToken: token});
+      this.state.token = token;
+      console.log('Token saved');
+    } catch (error) {
+      console.log(error);
+    }
   },
   createSalt: function() {
       return CryptoJS.HmacSHA1(this.state.username, "Key").toString();
