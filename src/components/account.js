@@ -11,26 +11,23 @@ import axios from 'axios';
 import store from 'react-native-simple-store';
 import MessageLoader from './messageLoader';
 import Message from './message';
+import Auth from './Auth';
 
 var styles = require('./styles');
 
 module.exports = React.createClass({
   componentDidMount: function() {
-    store.get('token').then(token => {
-      this.state.token = token.loginToken;
-      console.log('Token found');
-      this.checkToken();
-    });
+    Auth.checkToken();
   },
   getInitialState: function() {
     return {
-      token: ''
+
     };
   },
   render: function() {
     if (window.loadMessages) {
       console.log('Loading messages..');
-      MessageLoader.getMessages(this.state.token);
+      MessageLoader.getMessages();
       window.loadMessages = false;
     }
     return (
@@ -62,28 +59,5 @@ module.exports = React.createClass({
   },
   gotoRightPage: function() {
     this.props.navigator.push({ name: 'post'});
-  },
-  checkToken: function() {
-    if (this.state.token === null) {
-      return;
-    }
-    var nav = this.props.navigator;
-    console.log('Attempting to login with token..');
-    axios({
-      method: 'post',
-      url: 'http://catkinson-001-site1.htempurl.com/api/Login?token=' + this.state.token,
-      dataType: "json"
-    })
-    .then(function (data) {
-      var response = data.request._response.split('"')[1];
-      console.log(response);
-      if (response !== 'success') {
-          nav.push({ name: 'login'});
-      }
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
-  },
-
+  }
 });

@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import axios from 'axios';
 import store from 'react-native-simple-store';
+import Auth from './Auth';
 
 var AES = require("crypto-js/aes");
 var SHA256 = require("crypto-js/sha256");
@@ -17,19 +18,13 @@ var styles = require('./styles');
 
 module.exports = React.createClass({
   componentDidMount: function() {
-    store.get('token').then(token => {
-      this.state.token = token.loginToken;
-      console.log(token);
-      console.log('Token found');
-      this.checkToken();
-    });
+    window.nav = this.props.navigator;
+    Auth.getSavedToken();
   },
   getInitialState: function() {
     return {
       username: '',
-      password: '',
-      loginResponse: '',
-      token: ''
+      password: ''
     };
   },
   render: function() {
@@ -88,84 +83,27 @@ module.exports = React.createClass({
   },
   tryLogin: function() {
     var hash = this.hashPassword();
-    var currentState = this.state;
-    var save = this.saveToken;
     var nav = this.props.navigator;
-    console.log('state: ', this.state);
     axios({
       method: 'post',
       url: 'http://catkinson-001-site1.htempurl.com/api/Login?username='+ this.state.username +'&password=' + hash,
       dataType: "json"
     })
     .then(function (data) {
-      this.state = currentState;
-      var response = data.request._response.split('"')[1];
-      var storeToken = saveToken;
-      response = response.split(':');
+      var response = data.request._response.split('"')[1].split(':');
       console.log(response);
-      this.state.loginResponse = response;
-      switch(response[0]) {
-        case 'success':
-          console.log('SUCCESS');
-          storeToken(response[1]);
-          save();
-          nav.push({ name: 'account'});
-          break;
-
-        case 'error':
-          this.handleBadResponse();
-          break;
-
-        default:
-          console.log('Error Unknown');
+      if (response[0] === 'success') {
+        console.log('Login successful');
+        Auth.saveToken(response[1]);
+        nav.push({ name: 'account'});
+      }
+      else {
+        console.log('Error Unknown');
       }
     })
     .catch(function (error) {
       console.log(error);
     });
-  },
-  checkToken: function() {
-    if (this.state.token === null) {
-      return;
-    }
-    console.log(this.state.token);
-    var nav = this.props.navigator;
-    console.log('Attempting to login with token..');
-    axios({
-      method: 'post',
-      url: 'http://catkinson-001-site1.htempurl.com/api/Login?token=' + this.state.token,
-      dataType: "json"
-    })
-    .then(function (data) {
-      var response = data.request._response.split('"')[1];
-      console.log(response);
-      switch(response) {
-        case 'success':
-          console.log('Loading next page..');
-          nav.push({ name: 'account'});
-          break;
-
-        case 'error':
-          handleBadResponse();
-          break;
-      }
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
-  },
-  saveToken: function(token) {
-    try {
-      console.log('Saving token: ' + token);
-      store.save('token', {loginToken: token});
-      this.state.token = token;
-      console.log('Token saved');
-    } catch (error) {
-      console.log(error);
-    }
-  },
-  handleBadResponse: function() {
-
   },
   hashPassword: function() {
     return CryptoJS.HmacSHA1(this.state.password, this.createSalt()).toString();

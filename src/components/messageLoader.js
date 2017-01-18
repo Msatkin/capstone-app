@@ -1,12 +1,6 @@
 import React from 'react';
-
-import {
-    Text,
-    View,
-    StyleSheet,
-    Navigator
-} from 'react-native';
 import axios from 'axios';
+import Auth from './Auth';
 
 export default class MessageLoader extends React.Component {
 
@@ -35,13 +29,13 @@ export default class MessageLoader extends React.Component {
     return messages;
   }
 
-  static getMessages(token) {
+  static getMessages() {
     console.log('Requesting messages..');
     var parseResponse = this.parseMessage;
     if (window.position !== undefined) {
       axios({
         method: 'get',
-        url: 'http://catkinson-001-site1.htempurl.com/api/Message?token=' + token + '&longitude=' + window.position[0] + '&latitude=' + window.position[1],
+        url: 'http://catkinson-001-site1.htempurl.com/api/Message?token=' + window.token + '&longitude=' + window.position[0] + '&latitude=' + window.position[1],
         dataType: "json"
       })
       .then(function (data) {
@@ -51,6 +45,7 @@ export default class MessageLoader extends React.Component {
         }
         window.messages = parseResponse(data.request._response);
         console.log('Messages: ' , window.messages);
+        this.forceUpdate();
       })
       .catch(function (error) {
         console.log(error);

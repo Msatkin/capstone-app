@@ -7,6 +7,7 @@ import {
     Navigator
 } from 'react-native';
 import axios from 'axios';
+import Auth from './Auth';
 
 var styles = require('./styles');
 
@@ -14,8 +15,7 @@ module.exports = React.createClass({
   getInitialState: function() {
     return {
       open: false,
-      viewed: false,
-      token: ''
+      viewed: false
     };
   },
   render: function() {
@@ -39,7 +39,7 @@ module.exports = React.createClass({
         console.log('viewed');
         this.state.viewed = true;
       }
-      if (this.props.username.toLowerCase() === this.props.myUsername.toLowerCase()) {
+      if (this.props.username.toLowerCase() === window.myUsername.toLowerCase()) {
         deleteButton = <TouchableHighlight style={styles.delete_button} onPress={this.deleteMessage} ><Text style={styles.delete_button_text}>Delete</Text></TouchableHighlight>
       }
       else {
@@ -63,10 +63,9 @@ module.exports = React.createClass({
   },
   addView: function(messageId) {
     console.log('Viewing message..')
-    console.log('token', this.props.token);
     axios({
       method: 'post',
-      url: 'http://catkinson-001-site1.htempurl.com/api/Message?token=' + this.props.token + '&messageId=' + this.props.messageId,
+      url: 'http://catkinson-001-site1.htempurl.com/api/Message?token=' + window.token + '&messageId=' + this.props.messageId,
       dataType: "json"
     })
     .then(function (data) {
@@ -80,7 +79,7 @@ module.exports = React.createClass({
   deleteMessage: function(messageId) {
     axios({
       method: 'delete',
-      url: 'http://catkinson-001-site1.htempurl.com/api/Message?token=' + this.props.token + '&messageId=' + this.props.messageId,
+      url: 'http://catkinson-001-site1.htempurl.com/api/Message?token=' + window.token + '&messageId=' + this.props.messageId,
       dataType: "json"
     })
     .then(function (data) {

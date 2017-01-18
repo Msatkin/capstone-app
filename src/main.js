@@ -7,6 +7,7 @@ import {
     Navigator
 } from 'react-native';
 import axios from 'axios';
+import Auth from './components/Auth';
 
 var Login = require('./components/login');
 var Account = require('./components/account');

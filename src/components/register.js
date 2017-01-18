@@ -12,6 +12,7 @@ import { findNodeHandle } from 'react-native';
 import TextInputState from 'react-native/lib/TextInputState';
 import axios from 'axios';
 import store from 'react-native-simple-store';
+import Auth from './Auth';
 
 var AES = require("crypto-js/aes");
 var SHA256 = require("crypto-js/sha256");
@@ -122,7 +123,6 @@ module.exports = React.createClass({
     var hash = this.hashPassword();
     var display = this.displayError;
     var nav = this.props.navigator;
-    var storeToken = this.saveToken;
     axios({
       method: 'post',
       url: 'http://catkinson-001-site1.htempurl.com/api/Register?username='+ this.state.username +'&password=' + hash + '&email=' + this.state.email
@@ -132,7 +132,7 @@ module.exports = React.createClass({
       console.log(response);
       switch (response[0]) {
         case 'success':
-          storeToken(response[1]);
+          Auth.saveToken(response[1]);
           nav.push({ name: 'account'});
           break;
 
@@ -151,16 +151,6 @@ module.exports = React.createClass({
   },
   hashPassword: function() {
     return CryptoJS.HmacSHA1(this.state.password, this.createSalt()).toString();
-  },
-  saveToken: function(token) {
-    try {
-      console.log('Saving token: ' + token);
-      store.save('token', {loginToken: token});
-      this.state.token = token;
-      console.log('Token saved');
-    } catch (error) {
-      console.log(error);
-    }
   },
   createSalt: function() {
       return CryptoJS.HmacSHA1(this.state.username, "Key").toString();
