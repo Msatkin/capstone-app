@@ -26,9 +26,10 @@ module.exports = React.createClass({
   },
   render: function() {
     if (window.loadMessages) {
+      window.loadMessages = false;
       console.log('Loading messages..');
       MessageLoader.getMessages();
-      window.loadMessages = false;
+      return (this.render());
     }
     return (
       <View>
@@ -51,6 +52,13 @@ module.exports = React.createClass({
             <Text style={styles.toolbar_button}>Post</Text>
           </TouchableHighlight>
         </View>
+        <TouchableHighlight
+          style={styles.register_submit_button}
+          underlayColor={'#328FE6'}
+          onPress={this.logout}
+          >
+          <Text style={styles.label}>Logout</Text>
+        </TouchableHighlight>
       </View>
     );
   },
@@ -59,5 +67,10 @@ module.exports = React.createClass({
   },
   gotoRightPage: function() {
     this.props.navigator.push({ name: 'post'});
+  },
+  logout: function() {
+    Auth.deleteSavedToken();
+    window.myUsername = '';
+    this.props.navigator.push({ name: 'login'});
   }
 });

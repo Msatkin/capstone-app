@@ -1,13 +1,14 @@
 import React from 'react';
 import axios from 'axios';
 import Auth from './Auth';
+import Message from './message';
 
 export default class MessageLoader extends React.Component {
 
   render() {
     return null;
   }
-
+/*
   static parseMessage(data) {
     data = data.replace('[{', '');
     data = data.replace('}]', '');
@@ -28,28 +29,47 @@ export default class MessageLoader extends React.Component {
     }
     return messages;
   }
-
-  static getMessages() {
+*/
+  static getMessages(update) {
     console.log('Requesting messages..');
     var parseResponse = this.parseMessage;
+    var formatDate = this.formatDate;
     if (window.position !== undefined) {
       axios({
         method: 'get',
         url: 'http://catkinson-001-site1.htempurl.com/api/Message?token=' + window.token + '&longitude=' + window.position[0] + '&latitude=' + window.position[1],
-        dataType: "json"
+        headers: {
+          'Content-Type': 'application/json'
+        }
       })
       .then(function (data) {
-        if (data.request._response === null) {
+        var response = JSON.parse(data.request._response);
+        if (response === null) {
           window.messages = '';
           return;
         }
-        window.messages = parseResponse(data.request._response);
-        console.log('Messages: ' , window.messages);
-        this.forceUpdate();
+        window.messages = [];
+        console.log(response);
+        for (var i = 0; i < response.length; i++) {
+          response[i].PostedDate = formatDate(response[i].PostedDate);
+          response[i].ExpirationDate = formatDate(response[i].ExpirationDate);
+          window.messages.push(<Message open={false} update={update} messageViews={response[i].Views} username={response[i].Username} message={response[i].Text} messageDate={response[i].PostedDate} messageExpDate={response[i].ExpirationDate} messageId={response[i].Id} key={i} />)
+        }
+        update();
       })
       .catch(function (error) {
         console.log(error);
       });
     }
+  }
+
+  static formatDate(date) {
+    console.log(date);
+    var parsedDate = date.toString().split('T')[0].split('-');
+    var parsedTime = date.toString().split('T')[1].split(':');
+    if (parsedTime[0] > 12) {
+      parsedTime[0] -= 12;
+    }
+    return parsedTime[0] + ':' + parsedTime[1] + ' ' + parsedDate[1] + '/' + parsedDate[2] + '/' + parsedDate[0];
   }
 }

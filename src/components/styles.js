@@ -116,11 +116,11 @@ module.exports = StyleSheet.create({
   },
   //---------------------------------------------------View screen
   loading_messages: {
-
+    fontSize: 20,
+    alignSelf: 'center'
   },
   viewBox: {
     flex: 1,
-    backgroundColor: '#ff0000'
   },
   //---------------------------------------------------Post Screen
   body: {
@@ -254,5 +254,16 @@ module.exports = StyleSheet.create({
   },
   expiration_delay_picker: {
     marginTop: 10
+  },
+  delete_button: {
+    alignItems: 'center',
+    margin: 3
+  },
+  delete_button_text: {
+    backgroundColor: '#6E5BAA',
+    padding: 10,
+    borderRadius: 5,
+    paddingLeft: 20,
+    paddingRight: 20,
   }
 });

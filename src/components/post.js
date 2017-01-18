@@ -28,9 +28,10 @@ module.exports = React.createClass({
   },
   render: function() {
     if (window.loadMessages) {
+      window.loadMessages = false;
       console.log('Loading messages..');
       MessageLoader.getMessages();
-      window.loadMessages = false;
+      return (this.render());
     }
     return (
       <View style={styles.body}>
@@ -119,7 +120,7 @@ module.exports = React.createClass({
       if (response !== 'success') {
         return;
       }
-      MessageLoader.getMessages();
+      window.loadMessages = true;
       nav.push({ name: 'view'});
     })
     .catch(function (error) {

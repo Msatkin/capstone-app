@@ -22,7 +22,7 @@ module.exports = React.createClass({
     if (this.state.open === false) {
       return (
         <View style={styles.message}>
-          <TouchableHighlight onPress={this.toggleOpen}>
+          <TouchableHighlight onPress={this.toggleOpen} underlayColor={'#328FE6'}>
             <View>
               <Text style={styles.username}>{this.props.username + ': '}<Text style={styles.message_date}>{this.props.messageDate}</Text></Text>
 
@@ -40,14 +40,14 @@ module.exports = React.createClass({
         this.state.viewed = true;
       }
       if (this.props.username.toLowerCase() === window.myUsername.toLowerCase()) {
-        deleteButton = <TouchableHighlight style={styles.delete_button} onPress={this.deleteMessage} ><Text style={styles.delete_button_text}>Delete</Text></TouchableHighlight>
+        deleteButton = <TouchableHighlight style={styles.delete_button} underlayColor={'#328FE6'} onPress={this.deleteMessage} ><Text style={styles.delete_button_text}>Delete</Text></TouchableHighlight>
       }
       else {
         deleteButton = null;
       }
       return (
         <View style={styles.message}>
-          <TouchableHighlight onPress={this.toggleOpen}>
+          <TouchableHighlight onPress={this.toggleOpen} underlayColor={'#328FE6'}>
             <View>
               <Text style={styles.username}>{this.props.username + ':'}</Text>
               <Text style={styles.message_open_text}>{this.props.message}</Text>
@@ -76,7 +76,10 @@ module.exports = React.createClass({
       console.log(error);
     });
   },
-  deleteMessage: function(messageId) {
+  deleteMessage: function() {
+    messageId = this.props.messageId;
+    var messageToDelete = null;
+    var update = this.props.update;
     axios({
       method: 'delete',
       url: 'http://catkinson-001-site1.htempurl.com/api/Message?token=' + window.token + '&messageId=' + this.props.messageId,
@@ -85,6 +88,21 @@ module.exports = React.createClass({
     .then(function (data) {
       var response = data.request._response.split('"')[1];
       console.log(response);
+      if (response === 'Message deleted') {
+        for (var i = 0; i < window.messages; i++) {
+          if (window.messages[i].Id === messageId) {
+            messageToDelete = i;
+          }
+        }
+        try {
+          window.messages.splice(i, 1);
+        }
+        catch (error) {
+          console.log(error);
+        }
+      }
+      console.log('forcing update');
+      update();
     })
     .catch(function (error) {
       console.log(error);

@@ -27,6 +27,7 @@ var ROUTES = {
 module.exports = React.createClass({
   watchID: null,
   componentDidMount: function() {
+    window.update = this.forceUpdate;
     window.messages = '';
     window.loadMessages = false;
     var loadMessages = this.getMessages;

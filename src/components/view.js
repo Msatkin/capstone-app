@@ -25,22 +25,24 @@ module.exports = React.createClass({
       builtMessages: [],
       buildMessages: false,
       myUsername: '',
+      update: 0
     };
   },
   render: function() {
+    console.log('test');
+    this.state = this.state;
+    var reload = this.update;
     if (window.loadMessages) {
-      console.log('Loading messages..');
-      MessageLoader.getMessages();
       window.loadMessages = false;
-      this.state.buildMessages = true;
+      console.log('Loading messages..');
+      MessageLoader.getMessages(reload);
     }
-    if (this.state.builtMessages.length !== window.messages.length) {
-      this.state.builtMessages = this.buildMessageDisplay();
-      console.log('Messages built: ' + this.state.builtMessages.length);
-      return (this.render());
+    if (window.messages.length < 1) {
+      this.state.builtMessages = (<Text key={999} style={styles.loading_messages}>{'Loading'}</Text>);
     }
-    else if (this.state.builtMessages.length < 1){
-      this.state.builtMessages.push(<Text key={1} style={styles.loading_messages}>{'Loading'}</Text>);
+    else {
+      this.state.builtMessages = [];
+      this.state.builtMessages = window.messages;
     }
     var _scrollView: ScrollView;
     return (
@@ -75,25 +77,13 @@ module.exports = React.createClass({
       </View>
     );
   },
-  buildMessageDisplay: function() {
-    console.log('Building ' + window.messages.length + ' messages..');
-    var messageList = window.messages;
-    var displayMessageList = [];
-    for (i = 0; i < messageList.length; i++) {
-      var username = messageList[i].Username;
-      var message = messageList[i].Message;
-      var messageDate = messageList[i].MessageDate;
-      var messageExpDate = messageList[i].MessageExpDate;
-      var messageId = messageList[i].Id;
-      var views = messageList[i].Views;
-      displayMessageList.push(<Message open={false} parent={this} messageViews={views} username={username} message={message} messageDate={messageDate} messageExpDate={messageExpDate} messageId={messageId} key={i} />);
-    }
-    return displayMessageList;
-  },
   gotoLeftPage: function() {
     this.props.navigator.push({ name: 'post'});
   },
   gotoRightPage: function() {
     this.props.navigator.push({ name: 'account'});
+  },
+  update: function() {
+    this.state.update++
   }
 });

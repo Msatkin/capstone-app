@@ -6,6 +6,10 @@ import {
 import axios from 'axios';
 import store from 'react-native-simple-store';
 
+var AES = require("crypto-js/aes");
+var SHA256 = require("crypto-js/sha256");
+var CryptoJS = require("crypto-js");
+
 export default class Auth extends React.Component {
   render() {
     return null;
@@ -28,7 +32,8 @@ export default class Auth extends React.Component {
         window.myUsername = response[1];
           console.log('User ' + response[1] + ' has been authenticated');
           if (page !== undefined) {
-          window.nav.push({ name: page});
+            console.log('Loading ' + page + 'page');
+            window.nav.push({ name: page});
           }
       }
       else {
@@ -52,16 +57,34 @@ export default class Auth extends React.Component {
     }
   }
 
-  static getSavedToken() {
+  static getSavedToken(page) {
+    console.log('Getting saved token..');
     try {
       store.get('token').then(token => {
-        window.token = token.loginToken;
-        console.log('Token found: ', window.token);
-        this.checkToken();
+        if (token !== null) {
+          window.token = token.loginToken;
+          console.log('Token found: ', window.token);
+          this.checkToken(page);
+        }
+        else {
+          console.log('No saved token found');
+        }
       });
     } catch (error) {
       console.log(error);
     }
   }
 
+  static deleteSavedToken() {
+    store.delete('token');
+    window.token = '';
+  }
+
+  static hashPassword(username, password) {
+    return CryptoJS.HmacSHA1(password, this.createSalt(username)).toString();
+  }
+
+  static createSalt(username) {
+      return CryptoJS.HmacSHA1(username.toLowerCase(), "Key").toString();
+  }
 }

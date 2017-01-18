@@ -14,9 +14,6 @@ import axios from 'axios';
 import store from 'react-native-simple-store';
 import Auth from './Auth';
 
-var AES = require("crypto-js/aes");
-var SHA256 = require("crypto-js/sha256");
-var CryptoJS = require("crypto-js");
 var styles = require('./styles');
 
 module.exports = React.createClass({
@@ -120,7 +117,7 @@ module.exports = React.createClass({
     }
   },
   attemptAccountCreation: function() {
-    var hash = this.hashPassword();
+    var hash = Auth.hashPassword(this.state.username, this.state.password);
     var display = this.displayError;
     var nav = this.props.navigator;
     axios({
@@ -148,12 +145,6 @@ module.exports = React.createClass({
     .catch(function (error) {
       console.log(error);
     });
-  },
-  hashPassword: function() {
-    return CryptoJS.HmacSHA1(this.state.password, this.createSalt()).toString();
-  },
-  createSalt: function() {
-      return CryptoJS.HmacSHA1(this.state.username, "Key").toString();
   },
   gotoLogin: function() {
     this.props.navigator.push({ name: 'login'});
