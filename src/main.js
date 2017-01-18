@@ -13,6 +13,7 @@ var Account = require('./components/account');
 var Register = require('./components/register');
 var Post = require('./components/post');
 var ViewMessages = require('./components/view');
+var styles = require('./components/styles');
 
 var ROUTES = {
   login: Login,
@@ -58,11 +59,5 @@ module.exports = React.createClass({
         configureScene={ () => { return Navigator.SceneConfigs.FloatFromBottomAndroid; } }
       />
     );
-  }
-});
-
-var styles = StyleSheet.create({
-  container: {
-    flex: 1
   }
 });

@@ -8,14 +8,15 @@ import {
   StyleSheet
 } from 'react-native';
 
-import { findNodeHandle } from 'react-native'
-import TextInputState from 'react-native/lib/TextInputState'
+import { findNodeHandle } from 'react-native';
+import TextInputState from 'react-native/lib/TextInputState';
 import axios from 'axios';
 import store from 'react-native-simple-store';
 
 var AES = require("crypto-js/aes");
 var SHA256 = require("crypto-js/sha256");
 var CryptoJS = require("crypto-js");
+var styles = require('./styles');
 
 module.exports = React.createClass({
   getInitialState: function() {
@@ -31,7 +32,7 @@ module.exports = React.createClass({
   },
   render: function() {
     return (
-      <View style={styles.container}>
+      <View style={styles.register_body}>
         <View style={styles.nav}>
           <TouchableHighlight
             style={styles.back_button}
@@ -42,7 +43,7 @@ module.exports = React.createClass({
           </TouchableHighlight>
         </View>
         <View style={styles.container_title}>
-          <Text style={styles.title}>GeoChat</Text>
+          <Text style={styles.register_title}>GeoChat</Text>
         </View>
         <View style={styles.register_container}>
           <Text style={styles.error_message}>{this.state.error[2]}</Text>
@@ -99,7 +100,7 @@ module.exports = React.createClass({
             />
 
           <TouchableHighlight
-            style={styles.button}
+            style={styles.register_submit_button}
             underlayColor={'#328FE6'}
             onPress={this.tryRegister}
             >
@@ -235,94 +236,5 @@ module.exports = React.createClass({
     } catch(e) {
       console.log("Couldn't focus text input: ", e.message)
     }
-  }
-});
-var styles = StyleSheet.create({
-  container_error_messages: {
-
-  },
-  error_message: {
-    fontWeight: '600',
-    color: '#ff0000'
-  },
-  error_message_final: {
-    fontWeight: '600',
-    color: '#ff0000',
-    marginBottom: 5,
-  },
-  container_title: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  nav: {
-    flex: 1,
-  },
-  back_button: {
-    alignSelf: 'flex-start',
-    borderWidth: 1,
-    borderRadius: 5,
-    borderColor: '#328FE6',
-    padding: 10,
-    backgroundColor: '#32c5e6',
-    maxHeight: 50
-  },
-  back_button_text: {
-    width: 130,
-    flex: 1,
-    alignSelf: 'center',
-    textAlign: 'center',
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#ffffff'
-  },
-  title: {
-    fontSize: 30,
-    textAlign: 'center',
-    margin: 10,
-    fontWeight: '600',
-    color: '#ffffff'
-  },
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'stretch',
-    backgroundColor: '#6E5BAA'
-  },
-  register_container: {
-    flex: 6,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  input: {
-    margin: 3,
-    width: 250,
-    color: '#555555',
-    padding: 10,
-    height: 50,
-    borderWidth: 2,
-    borderRadius: 4,
-    alignSelf: 'center',
-    backgroundColor: '#ffffff'
-  },
-  button: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 2,
-    borderRadius: 5,
-    borderColor: '#328FE6',
-    padding: 10,
-    marginTop: 10,
-    backgroundColor: '#32c5e6',
-    maxHeight: 50
-  },
-  label: {
-    width: 230,
-    flex: 1,
-    alignSelf: 'center',
-    textAlign: 'center',
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#ffffff'
   }
 });

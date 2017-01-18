@@ -5,11 +5,14 @@ import {
   TextInput,
   TouchableHighlight,
   StyleSheet,
+  Picker,
   AsyncStorage
 } from 'react-native';
 import axios from 'axios';
 import store from 'react-native-simple-store';
 import MessageLoader from './messageLoader';
+
+var styles = require('./styles');
 
 module.exports = React.createClass({
   componentDidMount: function() {
@@ -23,7 +26,8 @@ module.exports = React.createClass({
     return {
       token: '',
       message: '',
-      position: ''
+      position: '',
+      expirationDelay: 3
     };
   },
   render: function() {
@@ -41,25 +45,39 @@ module.exports = React.createClass({
               underlayColor={'#4d3f76'}
               onPress={this.gotoLeftPage}
               >
-              <Text style={styles.toolbarButton}>Account</Text>
+              <Text style={styles.toolbar_button}>Account</Text>
             </TouchableHighlight>
 
-            <Text style={styles.toolbarTitle}>Post</Text>
+            <Text style={styles.toolbar_title}>Post</Text>
 
             <TouchableHighlight
               style={styles.button}
               underlayColor={'#4d3f76'}
               onPress={this.gotoRightPage}
               >
-              <Text style={styles.toolbarButton}>View</Text>
+              <Text style={styles.toolbar_button}>View</Text>
             </TouchableHighlight>
           </View>
         </View>
-        <View style={styles.input}>
-          <View style={styles.messageArea}>
+        <View>
+          <Picker
+            style={styles.expiration_delay_picker}
+            selectedValue={this.state.expirationDelay}
+            onValueChange={(delay) => this.setState({expirationDelay: delay})}>
+            <Picker.Item label="Message will expire in 1 day" value="1" />
+            <Picker.Item label="Message will expire in 2 days" value="2" />
+            <Picker.Item label="Message will expire in 3 days" value="3" />
+            <Picker.Item label="Message will expire in 4 days" value="4" />
+            <Picker.Item label="Message will expire in 5 days" value="5" />
+            <Picker.Item label="Message will expire in 6 days" value="6" />
+            <Picker.Item label="Message will expire in 7 days" value="7" />
+          </Picker>
+        </View>
+        <View style={styles.post_input}>
+          <View style={styles.message_area}>
             <TextInput
               focus={true}
-              style={styles.messageBox}
+              style={styles.message_box}
               value={this.state.message}
               onChangeText={(text) => this.setState({message: text})}
               placeholder={'Type your post here..'}
@@ -69,13 +87,13 @@ module.exports = React.createClass({
               />
           </View>
         </View>
-        <View style={styles.submitArea}>
+        <View style={styles.submit_area}>
           <TouchableHighlight
             style={styles.button}
             underlayColor={'#328FE6'}
             onPress={this.submit}
             >
-            <Text style={styles.submitButton}>Submit</Text>
+            <Text style={styles.submit_button}>Submit</Text>
           </TouchableHighlight>
         </View>
       </View>
@@ -136,62 +154,4 @@ module.exports = React.createClass({
       console.log(error);
     });
   },
-
-});
-
-var styles = StyleSheet.create({
-  body: {
-    flex: 1,
-    flexDirection:'column'
-  },
-  navbar: {
-    flex:1,
-    flexDirection:'column',
-    alignItems:'flex-start'
-  },
-  submitArea: {
-    backgroundColor: '#328FE6',
-    justifyContent: 'flex-end'
-  },
-  messageBox: {
-    flex: 1,
-    textAlignVertical: 'bottom'
-  },
-  submitButton: {
-    color:'#fff',
-    textAlign:'center',
-    padding: 7
-  },
-  toolbar: {
-      backgroundColor:'#6E5BAA',
-      paddingTop:10,
-      paddingBottom:10,
-      flexDirection:'row',
-      elevation: 10
-  },
-  toolbarButton: {
-      color:'#fff',
-      textAlign:'center'
-  },
-  toolbarTitle: {
-      color:'#fff',
-      textAlign:'center',
-      fontWeight:'900',
-      flex:1
-  },
-  button: {
-      justifyContent: 'center',
-      alignItems: 'center',
-      padding: 10,
-      flex: 1
-    },
-    input: {
-      flex: 10,
-      marginTop: 10,
-      justifyContent: 'flex-end'
-    },
-    messageArea: {
-      flex: 1,
-      justifyContent: 'flex-end'
-    }
 });

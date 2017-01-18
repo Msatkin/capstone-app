@@ -13,6 +13,7 @@ import store from 'react-native-simple-store';
 var AES = require("crypto-js/aes");
 var SHA256 = require("crypto-js/sha256");
 var CryptoJS = require("crypto-js");
+var styles = require('./styles');
 
 module.exports = React.createClass({
   componentDidMount: function() {
@@ -33,11 +34,11 @@ module.exports = React.createClass({
   },
   render: function() {
     return (
-      <View style={styles.container}>
+      <View style={styles.login_container}>
         <View style={styles.title}>
           <Text style={styles.name}>GeoChat</Text>
         </View>
-        <View style={styles.loginContainer}>
+        <View style={styles.input_container}>
           <TextInput
             style={styles.input}
             value={this.state.username}
@@ -58,7 +59,7 @@ module.exports = React.createClass({
               />
 
           <TouchableHighlight
-            style={styles.button}
+            style={styles.big_button}
             underlayColor={'#328FE6'}
             onPress={this.tryLogin}
             >
@@ -67,19 +68,19 @@ module.exports = React.createClass({
         </View>
         <View style={styles.extra_buttons}>
           <TouchableHighlight
-            style={styles.small_button}
+            style={styles.half_button}
             underlayColor={'#328FE6'}
             onPress={this.onPress}
             >
-            <Text style={styles.small_button_label}>Forgot Password</Text>
+            <Text style={styles.half_button_label}>Forgot Password</Text>
           </TouchableHighlight>
 
           <TouchableHighlight
-            style={styles.small_button}
+            style={styles.half_button}
             underlayColor={'#328FE6'}
             onPress={this.gotoRegister}
             >
-            <Text style={styles.small_button_label}>Register</Text>
+            <Text style={styles.half_button_label}>Register</Text>
           </TouchableHighlight>
         </View>
       </View>
@@ -174,87 +175,5 @@ module.exports = React.createClass({
   },
   gotoRegister: function() {
     this.props.navigator.push({ name: 'register'});
-  }
-});
-
-var styles = StyleSheet.create({
-  title: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  extra_buttons: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  name: {
-    fontSize: 30,
-    textAlign: 'center',
-    margin: 10,
-    fontWeight: '600',
-    color: '#ffffff'
-  },
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'stretch',
-    backgroundColor: '#6E5BAA'
-  },
-  loginContainer: {
-    flex: 3,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  input: {
-    margin: 3,
-    width: 250,
-    color: '#555555',
-    padding: 10,
-    height: 50,
-    borderColor: '#32C5E6',
-    borderWidth: 2,
-    borderRadius: 4,
-    alignSelf: 'center',
-    backgroundColor: '#ffffff'
-  },
-  button: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 2,
-    borderRadius: 5,
-    borderColor: '#328FE6',
-    padding: 10,
-    marginTop: 10,
-    backgroundColor: '#32c5e6',
-    maxHeight: 50
-  },
-  small_button: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 2,
-    borderRadius: 5,
-    borderColor: '#328FE6',
-    marginTop: 5,
-    backgroundColor: '#32c5e6',
-    maxHeight: 30
-  },
-  small_button_label: {
-    width: 125,
-    flex: 1,
-    alignSelf: 'center',
-    textAlign: 'center',
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#ffffff'
-  },
-  label: {
-    width: 230,
-    flex: 1,
-    alignSelf: 'center',
-    textAlign: 'center',
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#ffffff'
   }
 });

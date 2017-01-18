@@ -19,19 +19,20 @@ export default class MessageLoader extends React.Component {
     data = data.replace('}]', '');
     data = data.replace(/"/gi, '')
     var messages = data.split('},{');
-    console.log(messages);
+    console.log('Number of messages found: ' + messages.length);
     for (var i = 0; i < messages.length; i++) {
       var messageInfo = messages[i].split(',');
       messages[i] = {
         Id: messageInfo[0].replace('Id:', ''),
-        Username: messageInfo[1].replace('UserId:', ''),
-        Message: messageInfo[3].replace('Username:', ''),
+        UserId: messageInfo[1].replace('UserId:', ''),
+        Username: messageInfo[3].replace('Username:', ''),
         Message: messageInfo[4].replace('Text:', ''),
-        MessageDate: messageInfo[5].replace('Date:', '')
+        MessageDate: messageInfo[5].replace('Date:', ''),
+        MessageExpDate: messageInfo[6].replace('ExpirationDate:', ''),
+        Views: messageInfo[9].replace('Views:', '')
       }
-      console.log(messages[i]);
-      return messages;
     }
+    return messages;
   }
 
   static getMessages(token) {
@@ -44,6 +45,10 @@ export default class MessageLoader extends React.Component {
         dataType: "json"
       })
       .then(function (data) {
+        if (data.request._response === null) {
+          window.messages = '';
+          return;
+        }
         window.messages = parseResponse(data.request._response);
         console.log('Messages: ' , window.messages);
       })

@@ -10,6 +10,9 @@ import {
 import axios from 'axios';
 import store from 'react-native-simple-store';
 import MessageLoader from './messageLoader';
+import Message from './message';
+
+var styles = require('./styles');
 
 module.exports = React.createClass({
   componentDidMount: function() {
@@ -38,17 +41,17 @@ module.exports = React.createClass({
             underlayColor={'#4d3f76'}
             onPress={this.gotoLeftPage}
             >
-            <Text style={styles.toolbarButton}>View</Text>
+            <Text style={styles.toolbar_button}>View</Text>
           </TouchableHighlight>
 
-          <Text style={styles.toolbarTitle}>Account</Text>
+          <Text style={styles.toolbar_title}>Account</Text>
 
           <TouchableHighlight
             style={styles.button}
             underlayColor={'#4d3f76'}
             onPress={this.gotoRightPage}
             >
-            <Text style={styles.toolbarButton}>Post</Text>
+            <Text style={styles.toolbar_button}>Post</Text>
           </TouchableHighlight>
         </View>
       </View>
@@ -83,30 +86,4 @@ module.exports = React.createClass({
     });
   },
 
-});
-
-var styles = StyleSheet.create({
-  toolbar: {
-      backgroundColor:'#6E5BAA',
-      paddingTop:10,
-      paddingBottom:10,
-      flexDirection:'row',
-      elevation: 10
-  },
-  toolbarButton: {
-      color:'#fff',
-      textAlign:'center'
-  },
-  toolbarTitle: {
-      color:'#fff',
-      textAlign:'center',
-      fontWeight: '900',
-      flex:1
-  },
-  button: {
-      justifyContent: 'center',
-      alignItems: 'center',
-      padding: 10,
-      flex: 1
-    },
 });
