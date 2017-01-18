@@ -129,6 +129,7 @@ module.exports = React.createClass({
       console.log(response);
       switch (response[0]) {
         case 'success':
+          Auth.deleteSavedToken();
           Auth.saveToken(response[1]);
           nav.push({ name: 'account'});
           break;

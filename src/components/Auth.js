@@ -19,7 +19,6 @@ export default class Auth extends React.Component {
     if (window.token === null) {
       return;
     }
-    console.log(window.token);
     console.log('Attempting to login with token..');
     axios({
       method: 'get',
@@ -37,7 +36,10 @@ export default class Auth extends React.Component {
           }
       }
       else {
-      nav.push({ name: 'login'});
+        //window.token = null;
+        if (page === undefined) {
+          //nav.push({ name: 'login'});
+        }
         console.log(response);
       }
     })
